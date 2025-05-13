@@ -134,14 +134,14 @@ module "lambda_save_course" {
   source_path = "${path.module}/src/save-course"
 
   environment_variables = {
-    TABLE_NAME = var.courses_table
+    TABLE_COURSES = var.courses_table
   }
 
   attach_policy_statements = true
   policy_statements = {
     dynamodb = {
       effect    = "Allow",
-      actions   = ["dynamodb:Scan", "dynamodb:PutItem"],
+      actions   = ["dynamodb:PutItem"],
       resources = ["${var.courses_table_arn}"],
     }
   }
