@@ -19,11 +19,11 @@ module "label_get_all_courses" {
   name    = "get-all-courses"
 }
 
-module "label_get_course" {
+module "label_get_courses" {
   source  = "cloudposse/label/null"
   version = "0.25.0"
   context = var.context
-  name    = "get-course"
+  name    = "get-courses"
 }
 
 module "label_save_course" {
@@ -69,6 +69,16 @@ module "lambda_get_all_authors" {
       resources = ["${var.authors_table_arn}"],
     }
   }
+
+  allowed_triggers = {
+    APIGatewayAny = {
+      service    = "apigateway"
+      source_arn = "${var.aws_api_gateway_rest_api_execution_arn}/*/*/*"
+    }
+  }
+  publish                                 = true
+  create_current_version_allowed_triggers = false
+
   tags = module.label.tags
 }
 
@@ -97,18 +107,18 @@ module "lambda_get_all_courses" {
   tags = module.label.tags
 }
 
-module "lambda_get_course" {
+module "lambda_get_courses" {
   source        = "terraform-aws-modules/lambda/aws"
   version       = "7.20.1"
-  function_name = module.label_get_course.id
+  function_name = module.label_get_courses.id
   description   = "My awesome lambda function"
   handler       = "index.handler"
   runtime       = "nodejs16.x"
 
-  source_path = "${path.module}/src/get-all-courses"
+  source_path = "${path.module}/src/get-courses"
 
   environment_variables = {
-    TABLE_NAME = var.courses_table
+    TABLE_COURSES = var.courses_table
   }
 
   attach_policy_statements = true
@@ -119,6 +129,15 @@ module "lambda_get_course" {
       resources = ["${var.courses_table_arn}"],
     }
   }
+
+  allowed_triggers = {
+    APIGatewayAny = {
+      service    = "apigateway"
+      source_arn = "${var.aws_api_gateway_rest_api_execution_arn}/*/*/*"
+    }
+  }
+  publish                                 = true
+  create_current_version_allowed_triggers = false
 
   tags = module.label.tags
 }
