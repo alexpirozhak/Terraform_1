@@ -12,12 +12,19 @@ exports.handler = (event, context, callback) => {
         },
         TableName: process.env.TABLE_NAME
     };
-    dynamodb.deleteItem(params, (err, data) => {
+    dynamodb.getItem(params, (err, data) => {
         if (err) {
             console.log(err);
             callback(err);
         } else {
-            callback(null, data);
+            callback(null, {
+                id: data.Item.id.S,
+                title: data.Item.title.S,
+                watchHref: data.Item.watchHref.S,
+                authorId: data.Item.authorId.S,
+                length: data.Item.length.S,
+                category: data.Item.category.S
+            });
         }
     });
 };

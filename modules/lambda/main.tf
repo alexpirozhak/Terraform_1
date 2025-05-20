@@ -1,6 +1,7 @@
 module "label" {
   source  = "cloudposse/label/null"
   version = "0.25.0"
+
   context = var.context
   name    = var.name
 }
@@ -8,48 +9,59 @@ module "label" {
 module "label_get_all_authors" {
   source  = "cloudposse/label/null"
   version = "0.25.0"
+
   context = var.context
   name    = "get-all-authors"
 }
 
 module "label_get_all_courses" {
-  source  = "cloudposse/label/null"
+  source = "cloudposse/label/null"
+
   version = "0.25.0"
+
   context = var.context
   name    = "get-all-courses"
 }
 
-module "label_get_courses" {
-  source  = "cloudposse/label/null"
+module "label_get_course" {
+  source = "cloudposse/label/null"
+
   version = "0.25.0"
+
   context = var.context
-  name    = "get-courses"
+  name    = "get-course"
 }
 
 module "label_save_course" {
-  source  = "cloudposse/label/null"
+  source = "cloudposse/label/null"
+
   version = "0.25.0"
+
   context = var.context
   name    = "save-course"
 }
 
 module "label_update_course" {
-  source  = "cloudposse/label/null"
+  source = "cloudposse/label/null"
+
   version = "0.25.0"
+
   context = var.context
   name    = "update-course"
 }
 
 module "label_delete_course" {
-  source  = "cloudposse/label/null"
+  source = "cloudposse/label/null"
+
   version = "0.25.0"
+
   context = var.context
   name    = "delete-course"
 }
 
 module "lambda_get_all_authors" {
   source        = "terraform-aws-modules/lambda/aws"
-  version       = "7.20.2"
+  version       = "7.20.1"
   function_name = module.label_get_all_authors.id
   description   = "My awesome lambda function"
   handler       = "index.handler"
@@ -70,21 +82,12 @@ module "lambda_get_all_authors" {
     }
   }
 
-  allowed_triggers = {
-    APIGatewayAny = {
-      service    = "apigateway"
-      source_arn = "${var.aws_api_gateway_rest_api_execution_arn}/*/*/*"
-    }
-  }
-  publish                                 = true
-  create_current_version_allowed_triggers = false
-
   tags = module.label.tags
 }
 
 module "lambda_get_all_courses" {
   source        = "terraform-aws-modules/lambda/aws"
-  version       = "7.20.2"
+  version       = "7.20.1"
   function_name = module.label_get_all_courses.id
   description   = "My awesome lambda function"
   handler       = "index.handler"
@@ -104,21 +107,22 @@ module "lambda_get_all_courses" {
       resources = ["${var.courses_table_arn}"],
     }
   }
+
   tags = module.label.tags
 }
 
-module "lambda_get_courses" {
+module "lambda_get_course" {
   source        = "terraform-aws-modules/lambda/aws"
   version       = "7.20.1"
-  function_name = module.label_get_courses.id
+  function_name = module.label_get_course.id
   description   = "My awesome lambda function"
   handler       = "index.handler"
   runtime       = "nodejs16.x"
 
-  source_path = "${path.module}/src/get-courses"
+  source_path = "${path.module}/src/get-course"
 
   environment_variables = {
-    TABLE_COURSES = var.courses_table
+    TABLE_NAME = var.courses_table
   }
 
   attach_policy_statements = true
@@ -129,15 +133,6 @@ module "lambda_get_courses" {
       resources = ["${var.courses_table_arn}"],
     }
   }
-
-  allowed_triggers = {
-    APIGatewayAny = {
-      service    = "apigateway"
-      source_arn = "${var.aws_api_gateway_rest_api_execution_arn}/*/*/*"
-    }
-  }
-  publish                                 = true
-  create_current_version_allowed_triggers = false
 
   tags = module.label.tags
 }
@@ -160,7 +155,7 @@ module "lambda_save_course" {
   policy_statements = {
     dynamodb = {
       effect    = "Allow",
-      actions   = ["dynamodb:PutItem"],
+      actions   = ["dynamodb:Scan", "dynamodb:PutItem"],
       resources = ["${var.courses_table_arn}"],
     }
   }
