@@ -29,7 +29,7 @@ exports.handler = (event, context, callback) => {
                 S: event.category
             }
         },
-        TableName: process.env.TABLE_COURSES
+        TableName: process.env.TABLE_NAME,
     };
     dynamodb.putItem(params, (err, data) => {
         if (err) {

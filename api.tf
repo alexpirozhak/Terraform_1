@@ -1,5 +1,6 @@
 module "label_api" {
-  source  = "cloudposse/label/null"
+  source = "cloudposse/label/null"
+  # Cloud Posse recommends pinning every module to a specific version
   version = "0.25.0"
   context = module.label.context
   name    = "api"
@@ -33,13 +34,13 @@ resource "aws_api_gateway_deployment" "this" {
 
   depends_on = [
     aws_api_gateway_method.get_authors,
-    # aws_api_gateway_method.get_all_courses,     # закоментовано
+    aws_api_gateway_method.get_all_courses,
     aws_api_gateway_method.save_course,
     aws_api_gateway_method.get_course,
     aws_api_gateway_method.delete_course,
     aws_api_gateway_method.update_course,
     aws_api_gateway_integration.get_authors,
-    # aws_api_gateway_integration.get_all_courses, # закоментовано
+    aws_api_gateway_integration.get_all_courses,
     aws_api_gateway_integration.save_course,
     aws_api_gateway_integration.get_course,
     aws_api_gateway_integration.delete_course,
@@ -104,8 +105,10 @@ resource "aws_lambda_permission" "get_all_courses" {
   action        = "lambda:InvokeFunction"
   function_name = module.lambda_functions.get_all_courses_arn
   principal     = "apigateway.amazonaws.com"
-  source_arn    = "${aws_api_gateway_rest_api.this.execution_arn}/*/*"
+
+  source_arn = "${aws_api_gateway_rest_api.this.execution_arn}/*/*"
 }
+
 
 module "cors_course" {
   source  = "squidfunk/api-gateway-enable-cors/aws"
@@ -158,8 +161,6 @@ resource "aws_api_gateway_integration_response" "save_course" {
     "method.response.header.Access-Control-Allow-Methods" = "'GET,OPTIONS,POST,PUT,DELETE'",
     "method.response.header.Access-Control-Allow-Origin"  = "'*'"
   }
-
-  depends_on = [aws_api_gateway_integration.save_course]
 }
 
 resource "aws_lambda_permission" "save_course" {

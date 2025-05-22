@@ -148,7 +148,7 @@ module "lambda_save_course" {
   source_path = "${path.module}/src/save-course"
 
   environment_variables = {
-    TABLE_COURSES = var.courses_table
+    TABLE_NAME = var.courses_table
   }
 
   attach_policy_statements = true
